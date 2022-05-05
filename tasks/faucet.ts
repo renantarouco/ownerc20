@@ -4,13 +4,6 @@ import '@nomiclabs/hardhat-ethers';
 task('faucet', 'Gives fake ETH to an account')
     .addPositionalParam('to', 'the address to give tokens to')
     .setAction(async ({ to }: { to: string }, hre) => {
-        if (hre.network.name !== 'hardhat' && hre.network.name !== 'localhost') {
-            console.error(
-                "You can't use the task to faucet acconts in networks other than" +
-                " 'hardhat' or 'localhost'"
-            );
-        }
-
         if (hre.network.name === 'hardhat') {
             console.warn(
               "You are running the faucet task with Hardhat network, which" +

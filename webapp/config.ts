@@ -1,6 +1,6 @@
 export default {
-    SALT_ROUNDS: 0,
-    PRIVATE_KEY: '',
-    NETWORK_URL: '',
-    JWT_SECRET: 'secret'
+    PRIVATE_KEY: '<private key>',
+    NETWORK_URL: '<network url>',
+    SALT_ROUNDS: 0, // for password encriptions
+    JWT_SECRET: '<secret>'
 };
