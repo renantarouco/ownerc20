@@ -1,9 +1,9 @@
 This project is the implementation of an example application with the following components:
 
-- _onchain:_ implementation of a token using ERC20 standard from @openzeppelin;
-- _offchain webapp (next.js):_
-  - _backend api:_ used to manage customers e with custodial wallets
-  - _frontend:_ provides pages for registration, authentication and dashboard with information
+- _onchain:_ implementation of a token using ERC20 standard from @openzeppelin.
+- _offchain:_
+  - _backend (moralis):_ used to manage users, sessions and listen to chain events;
+  - _frontend (next.js):_ provides pages for registration, authentication and dashboard with information.
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
@@ -29,19 +29,22 @@ yarn hardhat test
 npx hardhat test
 ```
 
-✔ should deploy with initial supply assigned to the owner
-✔ should return zero balance for new wallets
-✔ should allow the registration of a new address
-✔ should allow the unregistration an address
-✔ should allow transfer from owner to other accounts
-✔ should allow transfer from other accounts to owner
-✔ shouldnt allow transfers from accounts other than the owner
-✔ shouldnt allow owner to give (mint) to unregistered addresses
-✔ should allow owner to give (mint) tokens
-✔ shouldnt allow accounts to give (mint) tokens to other accounts (including themselves)
-✔ shouldnt allow owner to deduct (burn) from unregistered addresses
-✔ should allow owner to deduct (burn) tokens
-✔ shouldnt allow accounts to deduct (burn) tokens from other accounts (including themselves)
+```bash
+Own ERC20
+  ✔ should deploy with initial supply assigned to the owner
+  ✔ should return zero balance for new wallets
+  ✔ should allow the registration of a new address
+  ✔ should allow the unregistration an address
+  ✔ should allow transfer from owner to other accounts
+  ✔ should allow transfer from other accounts to owner
+  ✔ shouldnt allow transfers from accounts other than the owner
+  ✔ shouldnt allow owner to give (mint) to unregistered addresses
+  ✔ should allow owner to give (mint) tokens
+  ✔ shouldnt allow accounts to give (mint) tokens to other accounts (including themselves)
+  ✔ shouldnt allow owner to deduct (burn) from unregistered addresses
+  ✔ should allow owner to deduct (burn) tokens
+  ✔ shouldnt allow accounts to deduct (burn) tokens from other accounts (including themselves)
+```
 
 ### Deploy
 
@@ -53,7 +56,7 @@ const config: HardhatUserConfig = {
   networks: {
     rinkeby: {
       url: "<url here>",
-      chainId: 1, // <chain id, 1 is mainnet>
+      chainId: 4, // <chain id, 1 is mainnet>
       accounts: ["<your private key>"],
     },
   },
@@ -80,9 +83,23 @@ In order to get some useful control of the application, some tasks are provided:
 
 - `deduct <from> <amount>`: burns some tokens from an account
 
+- `register <target>`: registers an address in the contract
+
 ## Off chain
 
-The off chain application code is in `./webapp`.
+The off chain application code is in `./webapp`. It is a _Next.js_ application and has three pages: _sign up_, _sign in_ and _index_.
+The backend parte is hosted in moralis that provides backend for storing users, sessions and chain events, which also provides
+good SDKs for react development.
+
+- **sign up:** requests username, e-mail and password for a new user. Sends this information to the
+  backend. Immediately redirects to the user dashboard since _Moralis_
+  already signs the user in.
+
+- **sign in:** form to sign a user in using _Moralis_.
+
+- **index:** the user dashboard. It gets the signed user information (username, wallet address) from the _Moralis_ backend, the basic contract
+  information (token symbol, token name and user balance) from the chain using [ethers.js](https://docs.ethers.io/v5/) and listens for chain events
+  on _websockets_ provided by _Moralis_ as well.
 
 ### Configure
 
@@ -92,14 +109,14 @@ Set the values in `./webapp/config.ts`:
 export default {
   PRIVATE_KEY: "<private key>",
   NETWORK_URL: "<network url>",
-  SALT_ROUNDS: 0, // for password encriptions
-  JWT_SECRET: "<secret>",
+  MORALIS_SERVER_URL: "<moralis server url>",
+  MORALIS_APP_ID: "<moralis app id>",
 };
 ```
 
-### Run backend and frontend development server
+### Run frontend development server
 
-First, run the development server:
+Run the development server:
 
 ```bash
 npm run dev
@@ -107,10 +124,7 @@ npm run dev
 yarn dev
 ```
 
-#### Front end
-
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-### Backend
-
-[API routes](https://nextjs.org/docs/api-routes/introduction)
+PS: A local chain provided by Hardhat can also be used, jsut make sure to properly configure moralis
+to point to your local chain.

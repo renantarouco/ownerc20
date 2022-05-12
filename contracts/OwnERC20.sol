@@ -11,6 +11,9 @@ contract OwnERC20 is ERC20 {
     address private immutable i_owner;
     mapping(address => bool) registeredAddresses;
 
+    event Give(address indexed to, uint256 amount);
+    event Deduct(address indexed from, uint256 amount);
+
     modifier onlyOwner() {
         if (msg.sender != i_owner) {
             revert OwnERC20__GiverOrDeductorIsNotTheOwner();
@@ -58,12 +61,7 @@ contract OwnERC20 is ERC20 {
         delete registeredAddresses[target];
     }
 
-    function isAddressRegistered(address target)
-        external
-        view
-        onlyOwner
-        returns (bool)
-    {
+    function isAddressRegistered(address target) external view returns (bool) {
         return registeredAddresses[target];
     }
 
@@ -73,6 +71,8 @@ contract OwnERC20 is ERC20 {
         mustBeRegistered(to)
     {
         _mint(to, amount);
+
+        emit Give(to, amount);
     }
 
     function deduct(address from, uint256 amount)
@@ -81,5 +81,7 @@ contract OwnERC20 is ERC20 {
         mustBeRegistered(from)
     {
         _burn(from, amount);
+
+        emit Deduct(from, amount);
     }
 }

@@ -159,10 +159,14 @@ export interface OwnERC20Interface extends utils.Interface {
 
   events: {
     "Approval(address,address,uint256)": EventFragment;
+    "Deduct(address,uint256)": EventFragment;
+    "Give(address,uint256)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Deduct"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Give"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
 }
 
@@ -177,6 +181,22 @@ export type ApprovalEvent = TypedEvent<
 >;
 
 export type ApprovalEventFilter = TypedEventFilter<ApprovalEvent>;
+
+export interface DeductEventObject {
+  from: string;
+  amount: BigNumber;
+}
+export type DeductEvent = TypedEvent<[string, BigNumber], DeductEventObject>;
+
+export type DeductEventFilter = TypedEventFilter<DeductEvent>;
+
+export interface GiveEventObject {
+  to: string;
+  amount: BigNumber;
+}
+export type GiveEvent = TypedEvent<[string, BigNumber], GiveEventObject>;
+
+export type GiveEventFilter = TypedEventFilter<GiveEvent>;
 
 export interface TransferEventObject {
   from: string;
@@ -447,6 +467,15 @@ export interface OwnERC20 extends BaseContract {
       spender?: string | null,
       value?: null
     ): ApprovalEventFilter;
+
+    "Deduct(address,uint256)"(
+      from?: string | null,
+      amount?: null
+    ): DeductEventFilter;
+    Deduct(from?: string | null, amount?: null): DeductEventFilter;
+
+    "Give(address,uint256)"(to?: string | null, amount?: null): GiveEventFilter;
+    Give(to?: string | null, amount?: null): GiveEventFilter;
 
     "Transfer(address,address,uint256)"(
       from?: string | null,
